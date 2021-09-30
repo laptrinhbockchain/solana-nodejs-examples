@@ -1,3 +1,4 @@
+// Reference: https://github.com/raydium-io/raydium-ui/blob/master/src/utils/swap.ts (Function: getSwapOutAmount)
 const web3 = require('@solana/web3.js');
 const TokenAmount = require('./TokenAmount');
 const { LIQUIDITY_POOLS, getPoolByName } = require('./pools');
@@ -176,6 +177,7 @@ async function getLiquidityInfos() {
 async function getSwapOutAmount(poolName, fromToken, toToken, amount, slippage) {
     if (liquidityPools==null) {
         liquidityPools = await getLiquidityInfos();
+        console.log("liquidityPools", JSON.stringify(liquidityPools, null, "   "));
     }
 
     let poolInfo = liquidityPools[getPoolByName(poolName).lp.mintAddress];
