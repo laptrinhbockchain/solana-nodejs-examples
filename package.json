@@ -1,0 +1,27 @@
+{
+  "name": "solana-nodejs-examples",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiemtienonline360/solana-nodejs-examples.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kiemtienonline360/solana-nodejs-examples/issues"
+  },
+  "homepage": "https://github.com/kiemtienonline360/solana-nodejs-examples#readme",
+  "dependencies": {
+    "@project-serum/borsh": "^0.2.2",
+    "@solana/spl-token": "^0.1.8",
+    "@solana/web3.js": "^1.29.1",
+    "bignumber.js": "^9.0.1",
+    "buffer-layout": "^1.2.2",
+    "minimist": "^1.2.5"
+  }
+}
