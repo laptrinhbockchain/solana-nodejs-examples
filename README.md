@@ -1,1 +1,1 @@
-# solana-nodejs-examples
+# Solana Examples in NodeJs
