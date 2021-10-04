@@ -3,7 +3,7 @@ const web3 = require('@solana/web3.js');
 
 // Constants
 const commitment = "confirmed";
-const nodeType = "testnet";
+let nodeType = "testnet";
 
 // Global variables
 let connection = null;
@@ -49,7 +49,7 @@ async function requestAirdrop(address) {
     console.log("Airdropped", resp);
 }
 
-// Show solana balance
+// Transfer solana between accounts
 async function transferSOL(fromPrivateKey, toAddress, amount) {
     let connection = getConnection();
     let fromAccount = web3.Keypair.fromSecretKey(new Uint8Array(hexToBytes(fromPrivateKey)));
@@ -78,11 +78,13 @@ function showHelp() {
     console.log("Please use by below command:");
     console.log("    node sol/solana-transfer.js --type=airdrop --address=5W767fcieKYMDKpPYn7TGVDQpMPpFGMUHFMSqeap43Wa");
     console.log("    node sol/solana-transfer.js --type=transfer --privateKey=1b5f9912206718b36d230bb93fcee722dcae707bb44270821e39df7bdeb6c54a42e379a07de4ed019dc82cd267c81272db051d5d3fcbc06eecef81ea78b9e743 --toAddress=XDC4iNqUJi6WAWXTwEFGo5z1AHzEVbMdB8mGi58jKsD --amount=0.001");
+    console.log("    node sol/solana-transfer.js --nodeType=mainnet-beta --type=transfer --privateKey=1b5f9912206718b36d230bb93fcee722dcae707bb44270821e39df7bdeb6c54a42e379a07de4ed019dc82cd267c81272db051d5d3fcbc06eecef81ea78b9e743 --toAddress=XDC4iNqUJi6WAWXTwEFGo5z1AHzEVbMdB8mGi58jKsD --amount=0.001");
 }
 
 async function main() {
-    console.log("NodeType:", nodeType);
     var opts = parseArgs(process.argv.slice(2));
+    if (opts.nodeType) nodeType = opts.nodeType;
+    console.log("NodeType:", nodeType);
     if (opts.type=="airdrop" && opts.address) {
         await requestAirdrop(opts.address);
     } else if (opts.type=="transfer" && opts.privateKey && opts.toAddress && opts.amount) {

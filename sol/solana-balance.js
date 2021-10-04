@@ -39,13 +39,13 @@ function showHelp() {
 }
 
 async function main() {
-    console.log("NodeType:", nodeType);
     var opts = parseArgs(process.argv.slice(2));
     if (opts.help) {
         showHelp();
     } else {
         if (opts.nodeType) nodeType = opts.nodeType;
         if (opts.accountAddress) accountAddress = opts.accountAddress;
+        console.log("NodeType:", nodeType);
         await showSolBalance();
     }
     process.exit(0);
