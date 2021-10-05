@@ -14,16 +14,17 @@ async function generateWallet() {
     let privateKey = derivePath(DERIVATION_PATH, seed).key;
     let account = Web3.Keypair.fromSeed(new Uint8Array(privateKey));
     console.log("Mnemonic:", mnemonic);
-    console.log("Private Key:", Buffer.from(account.secretKey).toString('hex'));
-    console.log("Private Key:", "[" + account.secretKey.join(",") + "]");
+    console.log("Private Key:", privateKey.toString('hex'));
+    console.log("Private Key:", "[" + privateKey.join(",") + "]");
     console.log("Wallet:", account.publicKey.toBase58());
     return true;
 }
 
 async function generateAccount() {
     let account = Web3.Keypair.generate();
-    console.log("Private Key:", Buffer.from(account.secretKey).toString('hex'));
-    console.log("Private Key:", "[" + account.secretKey.join(",") + "]");
+    let privateKey = Buffer.from(account.secretKey).slice(0, 32);
+    console.log("Private Key:", privateKey.toString('hex', 0, 32));
+    console.log("Private Key:", "[" + privateKey.join(",") + "]");
     console.log("Wallet:", account.publicKey.toBase58());
     return true;
 }
@@ -33,21 +34,21 @@ async function checkWallet(mnemonic) {
     let privateKey = derivePath(DERIVATION_PATH, seed).key;
     let account = Web3.Keypair.fromSeed(new Uint8Array(privateKey));
     console.log("Mnemonic:", mnemonic);
-    console.log("Private Key:", Buffer.from(account.secretKey).toString('hex'));
-    console.log("Private Key:", "[" + account.secretKey.join(",") + "]");
+    console.log("Private Key:", privateKey.toString('hex'));
+    console.log("Private Key:", "[" + privateKey.join(",") + "]");
     console.log("Wallet:", account.publicKey.toBase58());
     return true;
 }
 
 async function checkAccount(privateKey) {
     if (privateKey.startsWith("[") && privateKey.endsWith("]")) {
-        privateKey = eval(privateKey);
+        privateKey = Buffer.from(eval(privateKey));
     } else {
         privateKey = Buffer.from(privateKey, "hex");
     }
     let account = Web3.Keypair.fromSeed(new Uint8Array(privateKey));
-    console.log("Private Key:", Buffer.from(account.secretKey).toString('hex'));
-    console.log("Private Key:", "[" + account.secretKey.join(",") + "]");
+    console.log("Private Key:", privateKey.toString('hex'));
+    console.log("Private Key:", "[" + privateKey.join(",") + "]");
     console.log("Wallet:", account.publicKey.toBase58());
     return true;
 }

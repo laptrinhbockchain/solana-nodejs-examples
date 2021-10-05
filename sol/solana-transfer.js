@@ -19,21 +19,6 @@ function getConnection() {
     return connection;
 }
 
-// Convert byte array to hexa string
-function toHexString(byteArray) {
-    return Array.from(byteArray, function(byte) {
-        return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-    }).join('')
-}
-
-// Convert hexa string to byte array
-function hexToBytes(hex) {
-    for (var bytes = [], c = 0; c < hex.length; c += 2) {
-        bytes.push(parseInt(hex.substr(c, 2), 16));
-    }
-    return bytes;
-}
-
 async function requestAirdrop(address) {
     let connection = getConnection();
     let account = new web3.PublicKey(address);
@@ -52,7 +37,7 @@ async function requestAirdrop(address) {
 // Transfer solana between accounts
 async function transferSOL(fromPrivateKey, toAddress, amount) {
     let connection = getConnection();
-    let fromAccount = web3.Keypair.fromSecretKey(new Uint8Array(hexToBytes(fromPrivateKey)));
+    let fromAccount = web3.Keypair.fromSecretKey(new Uint8Array(Buffer.from(fromPrivateKey, "hex")));
     let toAccount = new web3.PublicKey(toAddress);
     let lamports = (amount*web3.LAMPORTS_PER_SOL).toFixed(0);
 
@@ -77,8 +62,9 @@ async function transferSOL(fromPrivateKey, toAddress, amount) {
 function showHelp() {
     console.log("Please use by below command:");
     console.log("    node sol/solana-transfer.js --type=airdrop --address=5W767fcieKYMDKpPYn7TGVDQpMPpFGMUHFMSqeap43Wa");
-    console.log("    node sol/solana-transfer.js --type=transfer --privateKey=1b5f9912206718b36d230bb93fcee722dcae707bb44270821e39df7bdeb6c54a42e379a07de4ed019dc82cd267c81272db051d5d3fcbc06eecef81ea78b9e743 --toAddress=XDC4iNqUJi6WAWXTwEFGo5z1AHzEVbMdB8mGi58jKsD --amount=0.001");
-    console.log("    node sol/solana-transfer.js --nodeType=mainnet-beta --type=transfer --privateKey=1b5f9912206718b36d230bb93fcee722dcae707bb44270821e39df7bdeb6c54a42e379a07de4ed019dc82cd267c81272db051d5d3fcbc06eecef81ea78b9e743 --toAddress=XDC4iNqUJi6WAWXTwEFGo5z1AHzEVbMdB8mGi58jKsD --amount=0.001");
+    console.log("    node sol/solana-transfer.js --type=transfer --privateKey=1b5f9912206718b36d230bb93fcee722dcae707bb44270821e39df7bdeb6c54a --toAddress=XDC4iNqUJi6WAWXTwEFGo5z1AHzEVbMdB8mGi58jKsD --amount=0.001");
+    console.log("    node sol/solana-transfer.js --nodeType=mainnet-beta --type=transfer --privateKey=1b5f9912206718b36d230bb93fcee722dcae707bb44270821e39df7bdeb6c54a --toAddress=XDC4iNqUJi6WAWXTwEFGo5z1AHzEVbMdB8mGi58jKsD --amount=0.001");
+    console.log("type is airdrop only support for testnet!");
 }
 
 async function main() {
