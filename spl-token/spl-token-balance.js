@@ -1,3 +1,4 @@
+const parseArgs = require('minimist');
 const web3 = require('@solana/web3.js');
 const splToken = require('@solana/spl-token');
 const BufferLayout = require('buffer-layout');
@@ -11,11 +12,6 @@ const ACCOUNT_LAYOUT = BufferLayout.struct([
     BufferLayout.blob(93),
 ]);
 const nodeType = "mainnet-beta";
-const accountAddresses = [
-    "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
-    "4Wiid5JonjxyH5ZPo4H2iJLXDrwESNZiXDKsp75bDkYV",
-    "7wKvqy5Yye8Dr8ERHAgWDKUdNmay3KDSQ3t4qUsUNiKb"
-];
 const tokenInfos = [
     {
         name: "Raydium",
@@ -40,6 +36,12 @@ const tokenInfos = [
         symbol: "USDC",
         mintAddr: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
         decimal: 6
+    },
+    {
+        name: 'Wrapped Solana',
+        symbol: 'WSOL',
+        mintAddr: 'So11111111111111111111111111111111111111112',
+        decimal: 9,
     },
 ];
 
@@ -140,10 +142,16 @@ async function showTokenBalance(accountAddr) {
     }
 }
 
+function showHelp() {
+    console.log("Please use by below commands:");
+    console.log("    node spl-token/spl-token-balance.js --accountAddr=4Wiid5JonjxyH5ZPo4H2iJLXDrwESNZiXDKsp75bDkYV");
+}
+
 async function main() {
     console.log("NodeType:", nodeType);
-    for (let idx=0; idx<accountAddresses.length; idx++) {
-        await showTokenBalance(accountAddresses[idx]);
+    var opts = parseArgs(process.argv.slice(2));
+    if (opts.accountAddr) {
+        await showTokenBalance(opts.accountAddr);
     }
     process.exit(0);
 }
