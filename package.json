@@ -18,6 +18,7 @@
   "homepage": "https://github.com/kiemtienonline360/solana-nodejs-examples#readme",
   "dependencies": {
     "@project-serum/borsh": "^0.2.2",
+    "@project-serum/serum": "^0.13.60",
     "@solana/spl-token": "^0.1.8",
     "@solana/web3.js": "^1.29.1",
     "bignumber.js": "^9.0.1",

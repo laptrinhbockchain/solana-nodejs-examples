@@ -1,8 +1,16 @@
 // Reference: https://github.com/raydium-io/raydium-ui/blob/master/src/store/liquidity.ts (Function: actionTree)
 const web3 = require('@solana/web3.js');
-const TokenAmount = require('./TokenAmount');
-const { LIQUIDITY_POOLS } = require('./pools');
-const { ACCOUNT_LAYOUT, AMM_INFO_LAYOUT_V4, MINT_LAYOUT } = require('./layout');
+const { ACCOUNT_LAYOUT, AMM_INFO_LAYOUT_V4 } = require('./utils/layout');
+const TOKENS = require('./utils/tokens').TOKENS;
+
+const rayUsdcPool = {
+    name: 'RAY-USDC',
+    coin: TOKENS.RAY,
+    pc: TOKENS.USDC,
+    ammId: '6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg',
+    poolCoinTokenAccount: 'FdmKUE4UMiJYFK5ogCngHzShuVKrFXBamPWcewDr31th',
+    poolPcTokenAccount: 'Eqrhxd7bDUCH3MepKmdVkgwazXRzY6iHhEoBpY7yAohk',
+};
 
 //
 const commitment = "confirmed";
@@ -28,22 +36,6 @@ function cloneDeep(obj) {
 
 function getBigNumber(num) {
     return num === undefined || num === null ? 0 : parseFloat(num.toString())
-}
-
-function getAddressForWhat(address) {
-    for (const pool of LIQUIDITY_POOLS) {
-        for (const [key, value] of Object.entries(pool)) {
-            if (key === 'lp') {
-                if (value.mintAddress === address) {
-                    return { key: 'lpMintAddress', lpMintAddress: pool.lp.mintAddress, version: pool.version }
-                }
-            } else if (value === address) {
-                return { key, lpMintAddress: pool.lp.mintAddress, version: pool.version }
-            }
-        }
-    }
-
-    return {}
 }
 
 // getMultipleAccounts
@@ -91,85 +83,30 @@ async function getMultipleAccounts(connection, publicKeys, commitment) {
 }
 
 async function getLiquidityInfos() {
-    const liquidityPools = {};
-    const publicKeys = [];
-    LIQUIDITY_POOLS.forEach((pool) => {
-        const { poolCoinTokenAccount, poolPcTokenAccount, ammOpenOrders, ammId, coin, pc, lp } = pool;
-        publicKeys.push(
-            new web3.PublicKey(poolCoinTokenAccount),
-            new web3.PublicKey(poolPcTokenAccount),
-            new web3.PublicKey(ammOpenOrders),
-            new web3.PublicKey(ammId),
-            new web3.PublicKey(lp.mintAddress)
-        );
-        const poolInfo = cloneDeep(pool);
-        poolInfo.coin.balance = new TokenAmount(0, coin.decimals)
-        poolInfo.pc.balance = new TokenAmount(0, pc.decimals)
-        liquidityPools[lp.mintAddress] = poolInfo
-    })
+    const liquidityPoolInfo = {};
+    const publicKeys = [
+        new web3.PublicKey(rayUsdcPool.ammId),
+        new web3.PublicKey(rayUsdcPool.poolCoinTokenAccount),
+        new web3.PublicKey(rayUsdcPool.poolPcTokenAccount),
+    ];
 
-    const multipleInfo = await getMultipleAccounts(getConnection(), publicKeys, commitment);
-    multipleInfo.forEach((info) => {
-        if (info) {
-            const address = info.publicKey.toBase58()
-            const data = Buffer.from(info.account.data)
-            const { key, lpMintAddress, version } = getAddressForWhat(address);
-            console.log(`key=${key} - lpMintAddress=${lpMintAddress} - version=${version}`);
-
-            if (key && lpMintAddress) {
-                const poolInfo = liquidityPools[lpMintAddress]
-
-                switch (key) {
-                    case 'poolCoinTokenAccount': {
-                        const parsed = ACCOUNT_LAYOUT.decode(data)
-                        // quick fix: Number can only safely store up to 53 bits
-                        poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(getBigNumber(parsed.amount))
-
-                        break
-                    }
-                    case 'poolPcTokenAccount': {
-                        const parsed = ACCOUNT_LAYOUT.decode(data)
-
-                        poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(getBigNumber(parsed.amount))
-
-                        break
-                    }
-                    case 'ammId': {
-                        let parsed
-                        if (version === 2) {
-                            parsed = AMM_INFO_LAYOUT.decode(data)
-                        } else if (version === 3) {
-                            parsed = AMM_INFO_LAYOUT_V3.decode(data)
-                        } else {
-                            parsed = AMM_INFO_LAYOUT_V4.decode(data)
-
-                            const { swapFeeNumerator, swapFeeDenominator } = parsed
-                            poolInfo.fees = {
-                                swapFeeNumerator: getBigNumber(swapFeeNumerator),
-                                swapFeeDenominator: getBigNumber(swapFeeDenominator)
-                            }
-                        }
-
-                        const { status, needTakePnlCoin, needTakePnlPc } = parsed
-                        poolInfo.status = getBigNumber(status)
-                        poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.minus(getBigNumber(needTakePnlCoin))
-                        poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.minus(getBigNumber(needTakePnlPc))
-
-                        break
-                    }
-                    // getLpSupply
-                    case 'lpMintAddress': {
-                        const parsed = MINT_LAYOUT.decode(data)
-
-                        poolInfo.lp.totalSupply = new TokenAmount(getBigNumber(parsed.supply), poolInfo.lp.decimals)
-
-                        break
-                    }
-                }
-            }
+    const multipleInfos = await getMultipleAccounts(getConnection(), publicKeys, commitment);
+    for (let idx=0; idx<multipleInfos.length; idx++) {
+        let info = multipleInfos[idx];
+        const data = Buffer.from(info.account.data)
+        if (idx==0) {
+            let parsed = AMM_INFO_LAYOUT_V4.decode(data)
+            liquidityPoolInfo.swapFeeNumerator = getBigNumber(parsed.swapFeeNumerator).toFixed(0);
+            liquidityPoolInfo.swapFeeDenominator = getBigNumber(parsed.swapFeeDenominator).toFixed(0);
+        } else if (idx==1) {
+            const parsed = ACCOUNT_LAYOUT.decode(data)
+            liquidityPoolInfo.rayBalance =  getBigNumber(parsed.amount).toFixed(0);
+        } else if (idx==2) {
+            const parsed = ACCOUNT_LAYOUT.decode(data)
+            liquidityPoolInfo.usdcBalance =  getBigNumber(parsed.amount).toFixed(0);
         }
-    });
-    return liquidityPools;
+    }
+    return liquidityPoolInfo;
 }
 
 async function main() {
