@@ -5,16 +5,10 @@ const SplToken = require('@solana/spl-token');
 const TokenAmount = require('./utils/TokenAmount');
 const SwapUtils = require('./utils/SwapUtils');
 const { nu64, struct, u8 } = require('buffer-layout');
-// const { Account, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction } = require('@solana/web3.js');
 const { TOKENS } = require('./utils/tokens');
 
 // 
 const LIQUIDITY_POOL_PROGRAM_ID_V4 = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8';
-// const ASSOCIATED_TOKEN_PROGRAM_ID = new web3.PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
-// const RENT_PROGRAM_ID = new web3.PublicKey('SysvarRent111111111111111111111111111111111');
-// const SYSTEM_PROGRAM_ID = new web3.PublicKey('11111111111111111111111111111111');
-// const TOKEN_PROGRAM_ID = new web3.PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
-// ;
 
 const SERUM_PROGRAM_ID_V3 = '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin';
 
