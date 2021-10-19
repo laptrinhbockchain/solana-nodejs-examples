@@ -144,7 +144,6 @@ async function swap(accountPk, fromToken, toToken, aIn, aOutMin) {
             transaction,
             signers
         );
-        console.log("fromWrappedSolAccount", getBigNumber(amountIn.wei) + 1e7, fromWrappedSolAccount)
     }
     if (toToken=="SOL") {
         toMint = TOKENS.WSOL.mintAddress;

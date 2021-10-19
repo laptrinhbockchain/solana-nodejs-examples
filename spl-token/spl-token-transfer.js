@@ -5,7 +5,7 @@ const splToken = require('@solana/spl-token');
 
 // Constants
 const commitment = "confirmed";
-const nodeType = "testnet";
+let nodeType = "testnet";
 
 // Global variables
 let connection = null;
