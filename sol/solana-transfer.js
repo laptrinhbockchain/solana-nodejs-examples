@@ -37,7 +37,7 @@ async function requestAirdrop(address) {
 // Transfer solana between accounts
 async function transferSOL(fromPrivateKey, toAddress, amount) {
     let connection = getConnection();
-    let fromAccount = web3.Keypair.fromSecretKey(new Uint8Array(Buffer.from(fromPrivateKey, "hex")));
+    let fromAccount = web3.Keypair.fromSeed(new Uint8Array(Buffer.from(fromPrivateKey, "hex")));
     let toAccount = new web3.PublicKey(toAddress);
     let lamports = (amount*web3.LAMPORTS_PER_SOL).toFixed(0);
 
@@ -56,7 +56,7 @@ async function transferSOL(fromPrivateKey, toAddress, amount) {
         transaction,
         [fromAccount]
     );
-    console.log("Response", signature);         // Signature is the transaction hash
+    console.log("Signature", signature);         // Signature is the transaction hash
 }
 
 function showHelp() {
