@@ -57,8 +57,8 @@ function showHelp() {
     console.log("Please use by below commands:");
     console.log("    node account/create-wallet.js --action=generate --type=mnemonic");
     console.log("    node account/create-wallet.js --action=generate --type=account");
-    console.log("    node account/create-wallet.js --action=check --type=mnemonic --mnemonic='xxxxxx'");
-    console.log("    node account/create-wallet.js --action=check --type=privatekey --privateKey='xxxxxx'");
+    console.log("    node account/create-wallet.js --action=check --type=mnemonic --mnemonic=\"xxxxxx\"");
+    console.log("    node account/create-wallet.js --action=check --type=privatekey --privateKey=xxxxxx");
     console.log("privateKey supports both array and hexa!");
 }
 
