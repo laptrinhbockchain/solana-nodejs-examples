@@ -11,7 +11,7 @@ const ACCOUNT_LAYOUT = BufferLayout.struct([
     BufferLayout.nu64('amount'),
     BufferLayout.blob(93),
 ]);
-const nodeType = "mainnet-beta";
+let nodeType = "mainnet-beta";
 const tokenInfos = [
     {
         name: "Raydium",
@@ -130,28 +130,41 @@ async function getTokenAccounts(accountAddr) {
 // Show token balance
 async function showTokenBalance(accountAddr) {
     let tokenAccounts = await getTokenAccounts(accountAddr);
+    let otherTokens = [];
     console.log(accountAddr + ":");
+    console.log("    Basic tokens:");
     for (let idx=0; idx<tokenAccounts.length; idx++) {
         let tokenAccount = tokenAccounts[idx];
         let mintAddr = tokenAccount.mint.toBase58();
         let item = findItemByKey(tokenInfos, "mintAddr", mintAddr);
         if (item) {
             let tokenBalance = (tokenAccount.amount/10**item.decimal).toFixed(6);
-            console.log(`    ${item.name} (${item.symbol}): ${tokenBalance}`);
+            console.log(`        ${item.name} (${item.symbol}): ${tokenBalance}`);
+        } else {
+            otherTokens.push( { mintAddr, amount: tokenAccount.amount } );
         }
+    }
+    console.log("    Other tokens:");
+    for (let idx=0; idx<otherTokens.length; idx++) {
+        let item = otherTokens[idx];
+        console.log(`        ${item.mintAddr}: ${item.amount}`);
     }
 }
 
 function showHelp() {
     console.log("Please use by below commands:");
     console.log("    node spl-token/spl-token-balance.js --accountAddr=4Wiid5JonjxyH5ZPo4H2iJLXDrwESNZiXDKsp75bDkYV");
+    console.log("    node spl-token/spl-token-balance.js --nodeType=testnet --accountAddr=5W767fcieKYMDKpPYn7TGVDQpMPpFGMUHFMSqeap43Wa");
 }
 
 async function main() {
-    console.log("NodeType:", nodeType);
     var opts = parseArgs(process.argv.slice(2));
+    if (opts.nodeType) nodeType = opts.nodeType;
+    console.log("NodeType:", nodeType);
     if (opts.accountAddr) {
         await showTokenBalance(opts.accountAddr);
+    } else {
+        showHelp();
     }
     process.exit(0);
 }
